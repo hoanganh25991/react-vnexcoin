@@ -41,7 +41,8 @@ export const getFakeSmsSteps = () => {
       }
     },
     {
-      title: "NB chuyển coin cho NM"
+      title: "NB chuyển coin cho NM",
+      btnLabel: "App do nothing. Next."
     },
     {
       title: "NB yêu cầu nhận tiền từ NTG",

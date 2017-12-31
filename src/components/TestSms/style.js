@@ -4,7 +4,7 @@ const _20px = 20
 export const style = {
   debugConDiv: {
     display: "flex",
-    minWidth: 850
+    minWidth: 770
   },
   phoneDemoDiv: {
     display: "block",
@@ -34,7 +34,9 @@ export const style = {
     marginBottom: _10px
   },
   debugSendSmsConDiv: {
-    width: 480
+    width: 400,
+    height: 680,
+    overflow: "hidden"
   },
   debugSendDiv: {
     marginBottom: _10px

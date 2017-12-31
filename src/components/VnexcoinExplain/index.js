@@ -41,6 +41,7 @@ export default class VnexcoinExplain extends PureComponent {
 
   render() {
     const { finished, stepIndex } = this.state
+    const { fcmData } = this.props
 
     return (
       <div style={s.debugConDiv}>
@@ -117,7 +118,7 @@ export default class VnexcoinExplain extends PureComponent {
             </StepLabel>
             <StepContent>
               {this.renderStepActions({ step: 1 })}
-              <TestSms />
+              <TestSms fcmData={fcmData} />
             </StepContent>
           </Step>
         </Stepper>

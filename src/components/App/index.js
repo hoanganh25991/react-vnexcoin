@@ -91,10 +91,11 @@ export default class App extends PureComponent {
   }
 
   render() {
+    const { fcmData } = this.state
     return (
       <MuiThemeProvider>
         <div style={s.debugConDiv}>
-          <VnexcoinExplain />
+          <VnexcoinExplain fcmData={fcmData} />
         </div>
       </MuiThemeProvider>
     )

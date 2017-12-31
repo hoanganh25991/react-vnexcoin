@@ -21,8 +21,7 @@ export default class TestSms extends PureComponent {
       // }
     ],
     smsSteps: [],
-    smsStepIndex: 0,
-    transaction: null
+    smsStepIndex: 0
   }
 
   getBackground = sms => {
@@ -41,7 +40,7 @@ export default class TestSms extends PureComponent {
     return type
   }
 
-  delay = (time = 1000) => {
+  delay = (time = 750) => {
     this.setState({ refresh: new Date() })
     return new Promise(rslv => setTimeout(rslv, time))
   }
@@ -55,7 +54,15 @@ export default class TestSms extends PureComponent {
 
     if (reqBody) {
       const { payload } = reqBody
-      const msg = payload.msg
+      let msg = payload.msg
+      const needTranId = msg.includes("{{transactionId}}")
+      if (needTranId) {
+        const { fcmData } = this.props
+        const id = fcmData.transaction.id
+        msg = msg.replace(/{{transactionId}}/g, id)
+        payload.msg = msg
+      }
+
       const type = this.getTypeFromNUmber(payload.senderNumber)
       const newSms = { msg, type }
       const smses = [...currSmses, newSms]
@@ -85,9 +92,22 @@ export default class TestSms extends PureComponent {
     this.setState({ smsStepIndex })
   }
 
+  scrollToBottom = () => {
+    // Get a reference to the div you want to auto-scroll.
+    // Create an observer and pass it a callback.
+    // Tell it to look for new children that will change the height.
+    const someElement = document.querySelector("div.screen")
+    const observer = new MutationObserver(function() {
+      someElement.scrollTop = someElement.scrollHeight
+    })
+    const config = { childList: true }
+    observer.observe(someElement, config)
+  }
+
   componentDidMount() {
     const smsSteps = getFakeSmsSteps()
     this.setState({ smsSteps })
+    this.scrollToBottom()
   }
 
   render() {
@@ -98,13 +118,16 @@ export default class TestSms extends PureComponent {
     const buyerNumber = "01256654629"
     const sellerNumber = "0909333143"
 
-    const { smses, smsStepIndex, smsSteps, transaction } = this.state
+    const { smses, smsStepIndex, smsSteps } = this.state
     const smsStepOrder = smsStepIndex + 1
     const smsStep = smsSteps[smsStepIndex]
     _("smsStep", smsStep)
 
     const fakeBtnLabel = (smsStep && smsStep.btnLabel) || "Fake received SMS"
     const disabledFakeBtn = (smsStep && smsStep.btnDisabled) || false
+
+    const { fcmData } = this.props
+    const exchangeDone = fcmData && fcmData.status === "DONE_TRANSFER_TO_SELLER"
 
     return (
       <div>
@@ -138,10 +161,11 @@ export default class TestSms extends PureComponent {
               </div>
             </DeviceFrame>
           </div>
-          {smsStep && (
-            <div style={s.debugSendSmsConDiv}>
-              <div style={s.debugSendDiv}>
-                <Fragment>
+          <div style={s.debugSendSmsConDiv}>
+            {exchangeDone && <div>Giao dich hoàn tất</div>}
+            {smsStep && (
+              <Fragment>
+                <div style={s.debugSendDiv}>
                   <div>
                     {smsStepOrder}. {smsStep.title}
                   </div>
@@ -152,20 +176,29 @@ export default class TestSms extends PureComponent {
                     onClick={this.fakeReceiveSMS(smsStep)}
                     style={s.nextBtn}
                   />
-                </Fragment>
-              </div>
-              <Fragment>
+                </div>
                 <div style={s.payloadDiv}>
                   <div>Payload</div>
-                  {smsStep.clicked && <ReactJson src={smsStep.reqBody} theme="monokai" />}
-                </div>
-                <div style={s.payloadDiv}>
-                  <div>Transaction</div>
-                  {transaction && <ReactJson src={transaction} theme="monokai" />}
+                  {smsStep.clicked &&
+                    smsStep.reqBody && (
+                      <ReactJson src={smsStep.reqBody} theme="monokai" name={"Payload"} iconStyle={"circle"} />
+                    )}
                 </div>
               </Fragment>
+            )}
+            <div style={s.payloadDiv}>
+              <div>Transaction</div>
+              {fcmData && (
+                <ReactJson
+                  src={fcmData}
+                  theme="monokai"
+                  name={"Transaction"}
+                  iconStyle={"circle"}
+                  collapseStringsAfterLength={25}
+                />
+              )}
             </div>
-          )}
+          </div>
         </div>
       </div>
     )
