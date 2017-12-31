@@ -131,7 +131,7 @@ export default class TestSms extends PureComponent {
 
     // const exchangeDone = transaction && transaction.status === "DONE_TRANSFER_TO_SELLER"
     const { fcmData } = this.props
-    const exchangeDone = fcmData && fcmData.status === "DONE_TRANSFER_TO_SELLER"
+    const exchangeDone = fcmData && fcmData.transaction.status === "DONE_TRANSFER_TO_SELLER"
 
     return (
       <div>
