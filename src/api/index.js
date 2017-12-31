@@ -16,6 +16,7 @@ const axios = OAxois.create({
 
 const ENCRYPT_SCOPE = "encrypt"
 const SUBMIT_SMS_MSG_SCOPE = "submitSmsMsg"
+const FIND_TRANSACTION_SCOPE = "findTransaction"
 
 export const encrypt = async reqBody => {
   const scope = ENCRYPT_SCOPE
@@ -41,6 +42,22 @@ export const submitSmsMsg = async reqBody => {
   } catch (err) {
     _(`[${scope}][ERR]`, err)
     alert("Fail to submit sms msg")
+    return null
+  }
+}
+
+export const findTransaction = async transactionId => {
+  const scope = FIND_TRANSACTION_SCOPE
+  try {
+    const res = await axios.post(`${endpoint}/api`, {
+      transactionId,
+      type: "FIND_TRANSACTION"
+    })
+    _(`[${scope}][res.data]`, res.data)
+    const { data: { transaction } } = res
+    return transaction
+  } catch (err) {
+    _(`[${scope}][ERR]`, err)
     return null
   }
 }

@@ -4,7 +4,7 @@ import DeviceFrame from "../DeviceFrame"
 import { getFakeSmsSteps } from "./steps"
 import RaisedButton from "material-ui/RaisedButton"
 import ReactJson from "react-json-view"
-import { encrypt as callEncrypt, submitSmsMsg as callSubmitSmsMsg } from "../../api/index"
+import { encrypt as callEncrypt, submitSmsMsg as callSubmitSmsMsg, findTransaction } from "../../api/index"
 
 const _ = console.log
 
@@ -21,7 +21,8 @@ export default class TestSms extends PureComponent {
       // }
     ],
     smsSteps: [],
-    smsStepIndex: 0
+    smsStepIndex: 0,
+    transaction: null
   }
 
   getBackground = sms => {
@@ -53,15 +54,25 @@ export default class TestSms extends PureComponent {
     const { reqBody } = smsStep
 
     if (reqBody) {
+      // Find out id
       const { payload } = reqBody
+      const { fcmData } = this.props
+      const id = fcmData && fcmData.transaction.id
+
+      // // Update debug transaction
+      // if(id){
+      //   _("xxx id", id)
+      //   const wait = findTransaction(id)
+      //   wait.then(transaction => this.setState({transaction}))
+      // }
+
+      // Update msg
       let msg = payload.msg
       const needTranId = msg.includes("{{transactionId}}")
-      if (needTranId) {
-        const { fcmData } = this.props
-        const id = fcmData.transaction.id
-        msg = msg.replace(/{{transactionId}}/g, id)
-        payload.msg = msg
-      }
+      msg = needTranId ? msg.replace(/{{transactionId}}/g, id) : msg
+
+      // Update payload
+      payload.msg = msg
 
       const type = this.getTypeFromNUmber(payload.senderNumber)
       const newSms = { msg, type }
@@ -110,7 +121,7 @@ export default class TestSms extends PureComponent {
     const buyerNumber = "01256654629"
     const sellerNumber = "0909333143"
 
-    const { smses, smsStepIndex, smsSteps } = this.state
+    const { smses, smsStepIndex, smsSteps, transaction } = this.state
     const smsStepOrder = smsStepIndex + 1
     const smsStep = smsSteps[smsStepIndex]
     _("smsStep", smsStep)
@@ -118,6 +129,7 @@ export default class TestSms extends PureComponent {
     const fakeBtnLabel = (smsStep && smsStep.btnLabel) || "Fake received SMS"
     const disabledFakeBtn = (smsStep && smsStep.btnDisabled) || false
 
+    // const exchangeDone = transaction && transaction.status === "DONE_TRANSFER_TO_SELLER"
     const { fcmData } = this.props
     const exchangeDone = fcmData && fcmData.status === "DONE_TRANSFER_TO_SELLER"
 
