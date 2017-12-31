@@ -1,2 +1,6 @@
 import "./devices.css"
-export const style = {}
+export const style = {
+  screenDiv: {
+    overflowY: "auto"
+  }
+}

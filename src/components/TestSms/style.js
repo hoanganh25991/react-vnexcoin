@@ -28,7 +28,7 @@ export const style = {
     padding: _10px
   },
   smsDiv: {
-    width: 272,
+    width: 250,
     borderRadius: 10,
     padding: _10px,
     marginBottom: _10px

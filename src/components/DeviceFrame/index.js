@@ -12,7 +12,9 @@ export default class DeviceFrame extends PureComponent {
         <div className="sleep" />
         <div className="volume" />
         <div className="camera" />
-        <div className="screen">{children}</div>
+        <div className="screen" style={s.screenDiv}>
+          {children}
+        </div>
       </div>
     )
   }

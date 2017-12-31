@@ -41,8 +41,8 @@ export default class TestSms extends PureComponent {
     return type
   }
 
-  delay = (time = 5000) => {
-    this.setState({ refresh: true })
+  delay = (time = 1000) => {
+    this.setState({ refresh: new Date() })
     return new Promise(rslv => setTimeout(rslv, time))
   }
 
@@ -52,42 +52,37 @@ export default class TestSms extends PureComponent {
     smsStep.btnDisabled = true
     const { smses: currSmses } = this.state
     const { reqBody } = smsStep
-    if (!reqBody) return
-    const { payload } = reqBody
-    const msg = payload.msg
-    const type = this.getTypeFromNUmber(payload.senderNumber)
-    const newSms = { msg, type }
-    const smses = [...currSmses, newSms]
-    this.setState({ smses })
 
-    // Encrypt payload
-    smsStep.btnLabel = "Encrypting..."
-    const payloadToken = await callEncrypt(reqBody)
-    if (!payloadToken) return
+    if (reqBody) {
+      const { payload } = reqBody
+      const msg = payload.msg
+      const type = this.getTypeFromNUmber(payload.senderNumber)
+      const newSms = { msg, type }
+      const smses = [...currSmses, newSms]
+      this.setState({ smses })
 
-    const infoEncryptWait = this.delay()
-    const infoSendWait = infoEncryptWait.then(() => {
-      smsStep.btnLabel = "Sending..."
-      return this.delay()
-    })
-    const wait2 = infoSendWait.then(async () => {
-      // // Submit sms msg
-      // smsStep.btnLabel = "Sending..."
-      smsStep.reqBody = { type: "SMS_MSG", payloadToken }
-      const received = await callSubmitSmsMsg(smsStep.reqBody)
+      const payloadToken = await callEncrypt(reqBody)
+      if (!payloadToken) return
+
+      // Encrypt payload
+      smsStep.btnLabel = "Encrypting..."
       await this.delay()
-      return received
-    })
 
-    wait2.then(received => {
+      // Submit sms msg
+      smsStep.btnLabel = "Submitting..."
+      smsStep.reqBody = { type: "SMS_MSG", payloadToken }
+      await this.delay()
+
+      const received = await callSubmitSmsMsg(smsStep.reqBody)
       if (!received) return
-      // Reset for next run
-      smsStep.btnDisabled = false
-      smsStep.btnLabel = null
-      const { smsStepIndex: curr } = this.state
-      const smsStepIndex = curr + 1
-      this.setState({ smsStepIndex })
-    })
+    }
+
+    // Reset for next run
+    smsStep.btnDisabled = false
+    smsStep.btnLabel = null
+    const { smsStepIndex: curr } = this.state
+    const smsStepIndex = curr + 1
+    this.setState({ smsStepIndex })
   }
 
   componentDidMount() {
