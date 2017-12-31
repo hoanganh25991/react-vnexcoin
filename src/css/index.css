@@ -1,0 +1,27 @@
+html, body {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    width: 100vw;
+    height: 100vh;
+    overflow-x: hidden;
+}
+
+#root {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100vw;
+    height: auto;
+    min-height: 100vh;
+}
+
+div {
+    color: #424242;
+    box-sizing: border-box;
+    font-family: Helvetica Neue, Segoe UI, Helvetica, Arial, sans-serif;
+    line-height: 1.28;
+    -webkit-font-smoothing: antialiased;
+}
