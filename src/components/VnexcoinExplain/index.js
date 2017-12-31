@@ -4,7 +4,7 @@ import React, { PureComponent } from "react"
 import FlatButton from "material-ui/FlatButton"
 import RaisedButton from "material-ui/RaisedButton"
 
-import Chip from "material-ui/Chip"
+import TestSms from "../TestSms"
 
 const _ = console.log
 
@@ -33,17 +33,9 @@ export default class VnexcoinExplain extends PureComponent {
     const { stepIndex } = this.state
 
     return (
-      <div style={{ margin: "12px 0" }}>
-        <RaisedButton label={nextLabel} primary={true} onClick={this.handleNext} />
-        {step > 0 && (
-          <FlatButton
-            label={backLabel}
-            disabled={stepIndex === 0}
-            disableTouchRipple={true}
-            disableFocusRipple={true}
-            onClick={this.handledivv}
-          />
-        )}
+      <div style={s.btnConDiv}>
+        <RaisedButton label={nextLabel} primary={true} onClick={this.handleNext} style={s.nextBtn} />
+        {step > 0 && <RaisedButton label={backLabel} disabled={stepIndex === 0} onClick={this.handledivv} />}
       </div>
     )
   }
@@ -52,10 +44,12 @@ export default class VnexcoinExplain extends PureComponent {
     const { finished, stepIndex } = this.state
 
     return (
-      <div style={{ maxWidth: 500, margin: "auto" }}>
+      <div style={s.mainDiv}>
         <Stepper activeStep={stepIndex} orientation="vertical">
           <Step>
-            <StepLabel>vnexcoin workflow</StepLabel>
+            <StepLabel>
+              <div style={s.stepTitle}>vnexcoin workflow</div>
+            </StepLabel>
             <StepContent>
               {this.renderStepActions({ step: 0, nextLabel: "Test" })}
               <ol>
@@ -104,7 +98,6 @@ export default class VnexcoinExplain extends PureComponent {
                 <li>
                   <div>NTG chuyển tiền cho NB</div>
                   <div style={s.subDiv}>
-                    <div>Sau khi nhận đc 2 tin nhắn DONE confirm từ NM & NB ở trên</div>
                     <div>Bắt đầu chuyển tiền bằng crawling</div>
                     <div>Status: TRANSFERRING_TO_SELLER</div>
                   </div>
@@ -128,10 +121,12 @@ export default class VnexcoinExplain extends PureComponent {
             </StepContent>
           </Step>
           <Step>
-            <StepLabel>Create an ad group</StepLabel>
+            <StepLabel>
+              <div style={s.stepTitle}>Test SMS</div>
+            </StepLabel>
             <StepContent>
-              <p>An ad group contains one or more ads which target a shared set of keywords.</p>
               {this.renderStepActions({ step: 1 })}
+              <TestSms />
             </StepContent>
           </Step>
         </Stepper>
@@ -140,7 +135,7 @@ export default class VnexcoinExplain extends PureComponent {
             <a
               href="#"
               onClick={event => {
-                event.divventDefault()
+                event.preventDefault()
                 this.setState({ stepIndex: 0, finished: false })
               }}
             >
