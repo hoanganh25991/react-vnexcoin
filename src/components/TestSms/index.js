@@ -4,6 +4,7 @@ import DeviceFrame from "../DeviceFrame"
 import { getFakeSmsSteps } from "./steps"
 import RaisedButton from "material-ui/RaisedButton"
 import ReactJson from "react-json-view"
+import { encrypt as callEncrypt, submitSmsMsg as callSubmitSmsMsg } from "../../api/index"
 
 const _ = console.log
 
@@ -20,7 +21,8 @@ export default class TestSms extends PureComponent {
       // }
     ],
     smsSteps: [],
-    smsStepIndex: 0
+    smsStepIndex: 0,
+    transaction: null
   }
 
   getBackground = sms => {
@@ -39,9 +41,15 @@ export default class TestSms extends PureComponent {
     return type
   }
 
-  fakeReceiveSMS = smsStep => () => {
+  delay = (time = 5000) => {
+    this.setState({ refresh: true })
+    return new Promise(rslv => setTimeout(rslv, time))
+  }
+
+  fakeReceiveSMS = smsStep => async () => {
     // Mark smsStep as clicked
     smsStep.clicked = true
+    smsStep.btnDisabled = true
     const { smses: currSmses } = this.state
     const { reqBody } = smsStep
     if (!reqBody) return
@@ -51,9 +59,36 @@ export default class TestSms extends PureComponent {
     const newSms = { msg, type }
     const smses = [...currSmses, newSms]
     this.setState({ smses })
-  }
 
-  sendFakeReceiveSMS = smsStep => () => {}
+    // Encrypt payload
+    smsStep.btnLabel = "Encrypting..."
+    const payloadToken = await callEncrypt(reqBody)
+    if (!payloadToken) return
+
+    const infoEncryptWait = this.delay()
+    const infoSendWait = infoEncryptWait.then(() => {
+      smsStep.btnLabel = "Sending..."
+      return this.delay()
+    })
+    const wait2 = infoSendWait.then(async () => {
+      // // Submit sms msg
+      // smsStep.btnLabel = "Sending..."
+      smsStep.reqBody = { type: "SMS_MSG", payloadToken }
+      const received = await callSubmitSmsMsg(smsStep.reqBody)
+      await this.delay()
+      return received
+    })
+
+    wait2.then(received => {
+      if (!received) return
+      // Reset for next run
+      smsStep.btnDisabled = false
+      smsStep.btnLabel = null
+      const { smsStepIndex: curr } = this.state
+      const smsStepIndex = curr + 1
+      this.setState({ smsStepIndex })
+    })
+  }
 
   componentDidMount() {
     const smsSteps = getFakeSmsSteps()
@@ -68,10 +103,13 @@ export default class TestSms extends PureComponent {
     const buyerNumber = "01256654629"
     const sellerNumber = "0909333143"
 
-    const { smses, smsStepIndex, smsSteps } = this.state
+    const { smses, smsStepIndex, smsSteps, transaction } = this.state
     const smsStepOrder = smsStepIndex + 1
     const smsStep = smsSteps[smsStepIndex]
     _("smsStep", smsStep)
+
+    const fakeBtnLabel = (smsStep && smsStep.btnLabel) || "Fake received SMS"
+    const disabledFakeBtn = (smsStep && smsStep.btnDisabled) || false
 
     return (
       <div>
@@ -113,26 +151,24 @@ export default class TestSms extends PureComponent {
                     {smsStepOrder}. {smsStep.title}
                   </div>
                   <RaisedButton
-                    label={"Fake received SMS"}
+                    label={fakeBtnLabel}
                     primary={true}
+                    disabled={disabledFakeBtn}
                     onClick={this.fakeReceiveSMS(smsStep)}
                     style={s.nextBtn}
                   />
                 </Fragment>
               </div>
-              {smsStep.clicked && (
-                <Fragment>
-                  <div style={s.payloadDiv}>
-                    <ReactJson src={smsStep.reqBody} theme="monokai" />
-                  </div>
-                  <RaisedButton
-                    label={"Send"}
-                    primary={true}
-                    onClick={this.sendFakeReceiveSMS(smsStep)}
-                    style={s.nextBtn}
-                  />
-                </Fragment>
-              )}
+              <Fragment>
+                <div style={s.payloadDiv}>
+                  <div>Payload</div>
+                  {smsStep.clicked && <ReactJson src={smsStep.reqBody} theme="monokai" />}
+                </div>
+                <div style={s.payloadDiv}>
+                  <div>Transaction</div>
+                  {transaction && <ReactJson src={transaction} theme="monokai" />}
+                </div>
+              </Fragment>
             </div>
           )}
         </div>
