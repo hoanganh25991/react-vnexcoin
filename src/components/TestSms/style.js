@@ -18,5 +18,13 @@ export const style = {
     height: _20px,
     border: "1px solid rgba(0, 0, 0, .2)",
     marginRight: _10px
+  },
+  deviceScreen: {
+    padding: _10px
+  },
+  smsDiv: {
+    width: 272,
+    borderRadius: 10,
+    padding: _10px
   }
 }
