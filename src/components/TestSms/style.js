@@ -29,6 +29,7 @@ export const style = {
   },
   smsDiv: {
     width: 250,
+    height: 400,
     borderRadius: 10,
     padding: _10px,
     marginBottom: _10px

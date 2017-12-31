@@ -66,7 +66,7 @@ export default class TestSms extends PureComponent {
       const type = this.getTypeFromNUmber(payload.senderNumber)
       const newSms = { msg, type }
       const smses = [...currSmses, newSms]
-      this.setState({ smses })
+      this.setState({ smses }, this.scrollScreenDiv)
 
       const payloadToken = await callEncrypt(reqBody)
       if (!payloadToken) return
@@ -92,22 +92,14 @@ export default class TestSms extends PureComponent {
     this.setState({ smsStepIndex })
   }
 
-  scrollToBottom = () => {
-    // Get a reference to the div you want to auto-scroll.
-    // Create an observer and pass it a callback.
-    // Tell it to look for new children that will change the height.
-    const someElement = document.querySelector("div.screen")
-    const observer = new MutationObserver(function() {
-      someElement.scrollTop = someElement.scrollHeight
-    })
-    const config = { childList: true }
-    observer.observe(someElement, config)
+  scrollScreenDiv = () => {
+    const screenDiv = document.querySelector("div.screen")
+    screenDiv.scrollTop = screenDiv.scrollHeight
   }
 
   componentDidMount() {
     const smsSteps = getFakeSmsSteps()
     this.setState({ smsSteps })
-    this.scrollToBottom()
   }
 
   render() {
