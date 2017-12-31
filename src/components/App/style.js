@@ -3,7 +3,7 @@ const _10px = 10
 const _5px = 5
 
 export const style = {
-  mainDiv: {},
+  debugConDiv: {},
   sendMsgDiv: {
     width: 250,
     minWidth: 320

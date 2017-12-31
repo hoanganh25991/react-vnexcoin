@@ -8,7 +8,7 @@ export const style = {
   nextBtn: {
     marginRight: _10px
   },
-  mainDiv: {
+  debugConDiv: {
     minWidth: 320,
     maxWidth: "100vw"
   },

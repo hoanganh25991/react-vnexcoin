@@ -1,7 +1,6 @@
 import { Step, Stepper, StepLabel, StepContent } from "material-ui/Stepper"
 import { style as s } from "./style"
 import React, { PureComponent } from "react"
-import FlatButton from "material-ui/FlatButton"
 import RaisedButton from "material-ui/RaisedButton"
 
 import TestSms from "../TestSms"
@@ -44,7 +43,7 @@ export default class VnexcoinExplain extends PureComponent {
     const { finished, stepIndex } = this.state
 
     return (
-      <div style={s.mainDiv}>
+      <div style={s.debugConDiv}>
         <Stepper activeStep={stepIndex} orientation="vertical">
           <Step>
             <StepLabel>
@@ -84,7 +83,7 @@ export default class VnexcoinExplain extends PureComponent {
                 <li>
                   <div>NB yêu cầu nhận tiền từ NTG</div>
                   <div style={s.subDiv}>
-                    <div>SMS: DONE [Số tài khoản NB]</div>
+                    <div>SMS: DONE [Số điện thoại NM] [Số tài khoản NB]</div>
                     <div>Status: ASK_TRANSFER</div>
                   </div>
                 </li>
@@ -99,14 +98,6 @@ export default class VnexcoinExplain extends PureComponent {
                   <div>NTG chuyển tiền cho NB</div>
                   <div style={s.subDiv}>
                     <div>Bắt đầu chuyển tiền bằng crawling</div>
-                    <div>Status: TRANSFERRING_TO_SELLER</div>
-                  </div>
-                </li>
-                <li>
-                  <div>NTG chuyển tiền cho NB lần 2</div>
-                  <div style={s.subDiv}>
-                    <div>Chuyển nhiều lần nếu số tiền lớn</div>
-                    <div>SMS: VCB thông báo</div>
                     <div>Status: TRANSFERRING_TO_SELLER</div>
                   </div>
                 </li>

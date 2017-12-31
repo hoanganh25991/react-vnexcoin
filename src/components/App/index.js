@@ -93,7 +93,7 @@ export default class App extends PureComponent {
   render() {
     return (
       <MuiThemeProvider>
-        <div style={s.mainDiv}>
+        <div style={s.debugConDiv}>
           <VnexcoinExplain />
         </div>
       </MuiThemeProvider>

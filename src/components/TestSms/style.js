@@ -2,12 +2,17 @@ const _5px = 5
 const _10px = 10
 const _20px = 20
 export const style = {
-  mainDiv: {
+  debugConDiv: {
     display: "flex",
-    minWidth: 510
+    minWidth: 850
   },
-  main1ConDiv: { display: "flex" },
-  phoneDemoDiv: { display: "block" },
+  phoneDemoDiv: {
+    display: "block",
+    marginRight: _20px
+  },
+  noteConDiv: {
+    marginBottom: _20px
+  },
   noteDiv: {
     display: "flex",
     alignItems: "center",
@@ -25,6 +30,14 @@ export const style = {
   smsDiv: {
     width: 272,
     borderRadius: 10,
-    padding: _10px
-  }
+    padding: _10px,
+    marginBottom: _10px
+  },
+  debugSendSmsConDiv: {
+    width: 480
+  },
+  debugSendDiv: {
+    marginBottom: _10px
+  },
+  payloadDiv: {}
 }
