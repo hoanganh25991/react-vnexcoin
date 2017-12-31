@@ -19,7 +19,7 @@ body {
 }
 
 div {
-    color: #424242;
+    /*color: #424242;*/
     box-sizing: border-box;
     font-family: Helvetica Neue, Segoe UI, Helvetica, Arial, sans-serif;
     line-height: 1.28;

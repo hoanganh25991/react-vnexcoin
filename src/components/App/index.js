@@ -1,8 +1,10 @@
-import React, { PureComponent, Fragment } from "react"
-import { style as s } from "./style"
-import * as firebase from "firebase"
 import dotenv from "dotenv"
+import * as firebase from "firebase"
+import { style as s } from "./style"
 import fbLogo from "../../img/fb-logo.png"
+import VnexcoinExplain from "../VnexcoinExplain"
+import React, { PureComponent, Fragment } from "react"
+import MuiThemeProvider from "material-ui/styles/MuiThemeProvider"
 
 dotenv.config()
 const {
@@ -10,9 +12,11 @@ const {
   REACT_APP_CLIENT_KEY: apiKey,
   REACT_APP_DATABASE_URL: databaseURL
 } = process.env
-const _ = console.log
+
 const FB_MAIN_BRANCH = "tmp"
 const VNEXCOIN_TOPIC = "vnexcoin"
+
+const _ = console.log
 
 export default class App extends PureComponent {
   state = {
@@ -42,25 +46,30 @@ export default class App extends PureComponent {
   }
 
   notifyMe = payload => {
+    if (!payload) return
     const { canPushNotification } = this.state
     if (!canPushNotification) return
-    const title = "FCM Push sent"
+    const title = "FCM Payload sent"
     const body = payload.msg || JSON.stringify(payload)
     const icon = fbLogo
     new Notification(title, { body, icon })
   }
 
-  componentDidMount() {
-    _("[ apiKey, authDomain, databaseURL]", apiKey, authDomain, databaseURL)
+  async componentDidMount() {
     const fbApp = firebase.initializeApp({ apiKey, authDomain, databaseURL })
     this.setState({ fbApp })
 
     const db = fbApp.database()
     const refToVnexcoin = db.ref(`${FB_MAIN_BRANCH}/${VNEXCOIN_TOPIC}`)
 
+    // Reset this debug branch
+    await refToVnexcoin.set(null)
+
+    // Listen FCM payload
     refToVnexcoin.on("value", snapshot => {
       const fcmDataStr = snapshot.val()
       _(`[fbApp][vnexcoin] snapshot`, fcmDataStr)
+
       const fcmData = JSON.parse(fcmDataStr)
       this.setState({ fcmData })
       this.notifyMe(fcmData)
@@ -71,16 +80,23 @@ export default class App extends PureComponent {
 
   componentWillUnmount() {
     const { fbApp } = this.state
-    if (!fbApp) return
-    fbApp
-      .delete()
-      .then(() => _("[fbApp] deleted"))
-      .catch(err => {
-        _("[fbApp] Fail to delete app", err)
-      })
+    if (fbApp) {
+      fbApp
+        .delete()
+        .then(() => _("[fbApp] deleted"))
+        .catch(err => {
+          _("[fbApp] Fail to delete app", err)
+        })
+    }
   }
 
   render() {
-    return <div style={s.rootDiv} />
+    return (
+      <MuiThemeProvider>
+        <div style={s.rootDiv}>
+          <VnexcoinExplain />
+        </div>
+      </MuiThemeProvider>
+    )
   }
 }
